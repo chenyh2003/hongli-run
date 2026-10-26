@@ -86,14 +86,14 @@ if QN.empty:
     sys.exit(0)
 
 idx_new = QN.index.union(RN.index)
-QF2 = pd.concat([QF, QN.reindex(idx_new)]).sort_index()
+QF2 = pd.concat([QF.astype("float64"), QN.reindex(idx_new).astype("float64")]).sort_index()
 QF2 = QF2[~QF2.index.duplicated(keep="last")]
-RW2 = pd.concat([RW, RN.reindex(idx_new)]).sort_index()
+RW2 = pd.concat([RW.astype("float64"), RN.reindex(idx_new).astype("float64")]).sort_index()
 RW2 = RW2[~RW2.index.duplicated(keep="last")]
 SH2 = SH.reindex(QF2.index).ffill()
 DPS2 = pd.concat([DPS, DN.reindex(idx_new)]).sort_index()
 DPS2 = DPS2[~DPS2.index.duplicated(keep="last")].fillna(0.0)
-TR2 = TR.reindex(QF2.index).copy()
+TR2 = TR.astype("float64").reindex(QF2.index).copy()
 prev_close = RW2.shift(1)
 mask = QF2.index > last
 TR2.loc[mask] = (RW2.loc[mask] + DPS2.loc[mask]) / prev_close.loc[mask] - 1
