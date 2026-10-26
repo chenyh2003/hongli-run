@@ -8,7 +8,8 @@ from common import path, outdir
 
 CAPITAL = 1_000_000
 
-z = np.load(path("cache") / "daily_cache.npz", allow_pickle=True)
+CACHE = path("cache")
+z = np.load(CACHE / ("daily_cache_slim.npz" if (CACHE / "daily_cache_slim.npz").exists() else "daily_cache.npz"), allow_pickle=True)
 dates = pd.to_datetime(z["dates"])
 codes = z["codes"]
 qfq = pd.DataFrame(z["qfq"], index=dates, columns=codes)
