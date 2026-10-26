@@ -1,0 +1,28 @@
+{
+  "offline": true,
+  "start_date": "2020-05-06",
+  "end_date": "2026-09-30",
+  "s1": {
+    "delay_days": 1,
+    "rebalance_month": 5,
+    "min_holdings": 5,
+    "vol_area": 0.5,
+    "keep_ratio": 0.5
+  },
+  "verify": {
+    "tolerance": 1e-08,
+    "ann_tolerance_pct": 0.01
+  },
+  "paths": {
+    "data": "data",
+    "cache": "data/cache",
+    "industry": "data/industry",
+    "rates": "data/rates",
+    "dividend": "data/raw/dividend/all_a_dividend",
+    "frozen": "frozen",
+    "reference": "frozen/reference",
+    "benchmark": "frozen/benchmark",
+    "holdings": "frozen/s1_holdings.json",
+    "output": "output"
+  }
+}

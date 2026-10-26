@@ -1,0 +1,56 @@
+name: daily-bcd
+
+on:
+  schedule:
+    - cron: "0 10 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: daily-bcd
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      UPDATE_MODE: daily
+      OFFLINE: "false"
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run BCD pipeline
+        run: python code/run_all.py
+
+      - name: Commit updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/cache data/rates output
+          git diff --staged --quiet || git commit -m "auto update $(date -u +%Y-%m-%d)"
+          git push
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: output/report
+
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
