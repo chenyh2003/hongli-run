@@ -145,7 +145,7 @@ def run(ret2d):
                                    "l3": L3.get(c, ""), "weight": w})
             for c, w in neww.items():
                 monthly.append({"date": d, "code": c, "weight": w})
-        if i == 0 or i >= len(all_dates) - 1:
+        if i == 0:
             continue
         od = all_dates[i - 1]
         c_ = (rs.get(od, 0) >= 0.5) or (rv.get(od, 0) >= 0.5)
