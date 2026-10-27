@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-"""每日持仓面板：持仓表 + 100 万资金 + 手数 + 打开页面自动刷新实时权重"""
-import json
+"""每日持仓面板：持仓表 + 100 万资金 + 手数
+权重按日更新（收盘），打开页面时自动拉取最新一日的 CSV。
+"""
 from pathlib import Path
 
 import numpy as np
@@ -63,25 +64,13 @@ T["lots"] = np.floor(T["value"] / (px * 100)).fillna(0).astype(int)
 T["shares"] = T["lots"] * 100
 T["actual_value"] = T["shares"] * px
 T["actual_w"] = T["actual_value"] / CAPITAL
-T["pnl"] = T["actual_value"] * T["ret"]
+T["pnl"] = T["actual_value"] * T["ret"].fillna(0)
+T["data_date"] = str(today.date())
 T = T.sort_values("actual_value", ascending=False).reset_index(drop=True)
 
 mv = T["actual_value"].sum()
 cash = CAPITAL - mv
 pnl = T["pnl"].sum()
-
-# 实时刷新用：基准日的原始价
-base_px = rawf.loc[mwd, T["code"]].astype(float)
-DATA = {
-    "capital": CAPITAL,
-    "exposure": expo,
-    "mwd": str(mwd.date()),
-    "rows": [{"code": r["code"], "base_w": float(base[r["code"]]),
-              "base_px": float(base_px[r["code"]])} for _, r in T.iterrows()],
-}
-
-def cell(v, fmt, cls=""):
-    return f"<td class='{cls}'>{fmt.format(v)}</td>"
 
 rows = []
 for _, r in T.iterrows():
@@ -114,8 +103,8 @@ tfoot td{{background:#f7f7f7;font-weight:bold}}
 #st{{color:#777;font-size:12px;margin:6px 0}}
 </style></head><body>
 <h1>策略1 BCD 今日持仓</h1>
-<div>数据日期：<b>{today.date()}</b> ｜ 目标权重基准日：{mwd.date()} ｜ 初始资金：{CAPITAL:,} 元 ｜ 仓位：{expo*100:.0f}%</div>
-<div id="st">打开页面后自动刷新实时报价（60 秒一次）</div>
+<div>数据日期：<b id="ddate">{today.date()}</b> ｜ 目标权重基准日：{mwd.date()} ｜ 初始资金：{CAPITAL:,} 元 ｜ 仓位：{expo*100:.0f}%</div>
+<div id="st">打开页面时自动检查最新数据（每日收盘后更新一次）</div>
 <div class="cards">
 <div class="card"><span>持仓市值</span><b id="mv">{mv:,.0f}</b></div>
 <div class="card"><span>现金</span><b id="cash">{cash:,.0f}</b></div>
@@ -131,83 +120,69 @@ tfoot td{{background:#f7f7f7;font-weight:bold}}
 <td id="tcontrib">{pnl/CAPITAL*100:+.2f}%</td><td></td><td></td><td id="tmv">{mv:,.0f}</td><td id="taw">{mv/CAPITAL*100:.2f}</td></tr></tfoot>
 </table>
 <p style="color:#777">手数 = 向下取整（当前权重 × 初始资金 × 仓位 ÷ (价格 × 100)）；现金 = 初始资金 − 持仓市值。</p>
-<p style="color:#777">行情：腾讯实时报价；页面打开时刷新，之后每 60 秒刷新；失败时显示最近一次计算结果。</p>
+<p style="color:#777">权重按收盘价计算，每天更新一次；打开页面时自动加载最新数据。</p>
 <script>
-const DATA = {json.dumps(DATA, ensure_ascii=False)};
-const SYM = c => (c[0] === '6' ? 'sh' : 'sz') + c;
+const CAPITAL = {CAPITAL};
+const CUR_DATE = '{today.date()}';
 
-function fmt(n, d=2) {{ return Number(n).toLocaleString('zh-CN', {{minimumFractionDigits:d, maximumFractionDigits:d}}); }}
+function num(x) {{ const v = parseFloat(x); return isFinite(v) ? v : 0; }}
 
-function apply() {{
-  const px = {{}}, pv = {{}}, tm = {{}};
-  let tstr = '';
-  for (const r of DATA.rows) {{
-    const v = window['v_' + SYM(r.code)];
-    if (!v) continue;
-    const f = v.split('~');
-    const p = parseFloat(f[3]), q = parseFloat(f[4]);
-    if (!isFinite(p)) continue;
-    px[r.code] = p; pv[r.code] = q; tm[r.code] = f[30] || '';
-    tstr = tm[r.code];
-  }}
-  let sumNow = 0, sumPrev = 0;
-  for (const r of DATA.rows) {{
-    const p = px[r.code] || r.base_px, q = pv[r.code] || r.base_px;
-    r._now = r.base_w * (p / r.base_px);
-    r._prev = r.base_w * (q / r.base_px);
-    r._p = p; r._ret = (q > 0 ? p / q - 1 : 0);
-    sumNow += r._now; sumPrev += r._prev;
-  }}
-  if (!sumNow) return;
-  let mv = 0, pnl = 0;
-  const tb = document.getElementById('tb');
-  for (const r of DATA.rows) {{
-    const nowW = r._now / sumNow, prevW = r._prev / sumPrev;
-    const val = nowW * DATA.exposure * DATA.capital;
-    const lots = Math.floor(val / (r._p * 100));
-    const av = lots * 100 * r._p;
-    mv += av; pnl += prevW * DATA.exposure * DATA.capital * r._ret;
-    const tr = tb.querySelector("tr[data-code='" + r.code + "']");
-    if (!tr) continue;
-    tr.querySelector('.c-now').innerHTML = '<b>' + (nowW * 100).toFixed(2) + '</b>';
-    const dw = (nowW - prevW) * 100;
-    const e1 = tr.querySelector('.c-dw'); e1.textContent = (dw >= 0 ? '+' : '') + dw.toFixed(2); e1.className = 'c-dw ' + (dw > 0 ? 'up' : (dw < 0 ? 'down' : ''));
-    const e2 = tr.querySelector('.c-ret'); e2.textContent = (r._ret >= 0 ? '+' : '') + (r._ret * 100).toFixed(2) + '%'; e2.className = 'c-ret ' + (r._ret > 0 ? 'up' : (r._ret < 0 ? 'down' : ''));
-    const ct = prevW * r._ret * 100;
-    const e3 = tr.querySelector('.c-contrib'); e3.textContent = (ct >= 0 ? '+' : '') + ct.toFixed(2) + '%'; e3.className = 'c-contrib ' + (ct > 0 ? 'up' : (ct < 0 ? 'down' : ''));
-    tr.querySelector('.c-price').textContent = r._p.toFixed(2);
-    tr.querySelector('.c-lots').textContent = lots.toLocaleString();
-    tr.querySelector('.c-value').textContent = Math.round(av).toLocaleString();
-    tr.querySelector('.c-aw').textContent = (av / DATA.capital * 100).toFixed(2);
-  }}
-  const cash = DATA.capital - mv, pr = pnl / DATA.capital * 100;
-  document.getElementById('mv').textContent = Math.round(mv).toLocaleString();
-  document.getElementById('cash').textContent = Math.round(cash).toLocaleString();
-  const ep = document.getElementById('pnl'); ep.textContent = (pnl >= 0 ? '+' : '') + Math.round(pnl).toLocaleString(); ep.className = pnl >= 0 ? 'up' : 'down';
-  const er = document.getElementById('pret'); er.textContent = (pr >= 0 ? '+' : '') + pr.toFixed(2) + '%'; er.className = pr >= 0 ? 'up' : 'down';
-  document.getElementById('tcontrib').textContent = (pr >= 0 ? '+' : '') + pr.toFixed(2) + '%';
-  document.getElementById('tmv').textContent = Math.round(mv).toLocaleString();
-  document.getElementById('taw').textContent = (mv / DATA.capital * 100).toFixed(2);
-  const t = tstr ? tstr.slice(0, 4) + '-' + tstr.slice(4, 6) + '-' + tstr.slice(6, 8) + ' ' + tstr.slice(8, 10) + ':' + tstr.slice(10, 12) + ':' + tstr.slice(12, 14) : '';
-  document.getElementById('st').textContent = '实时报价已更新 ' + new Date().toLocaleTimeString() + (t ? '（行情时间 ' + t + '）' : '') + '，60 秒自动刷新';
+function loadLatest() {{
+  fetch('今日权重.csv?_=' + Date.now(), {{cache: 'no-store'}})
+    .then(r => r.text())
+    .then(txt => {{
+      const lines = txt.trim().split(/\\r?\\n/);
+      if (lines.length < 2) return;
+      const head = lines[0].split(',').map(s => s.replace(/^\\uFEFF/, '').trim());
+      const col = n => head.indexOf(n);
+      const recs = lines.slice(1).map(l => l.split(','));
+      const d = recs[0][col('data_date')] || CUR_DATE;
+      let mv = 0, pnl = 0;
+      const tb = document.getElementById('tb');
+      for (const r of recs) {{
+        const code = r[col('code')].padStart(6, '0');
+        const tr = tb.querySelector("tr[data-code='" + code + "']");
+        if (!tr) continue;
+        const now = num(r[col('now')]) * 100;
+        const dw = num(r[col('dw')]) * 100;
+        const ret = num(r[col('ret')]) * 100;
+        const ct = num(r[col('contrib')]) * 100;
+        const price = num(r[col('price')]);
+        const lots = Math.round(num(r[col('lots')]));
+        const value = num(r[col('actual_value')]);
+        const aw = num(r[col('actual_w')]) * 100;
+        const p = num(r[col('pnl')]);
+        mv += value; pnl += p;
+        tr.querySelector('.c-now').innerHTML = '<b>' + now.toFixed(2) + '</b>';
+        const e1 = tr.querySelector('.c-dw'); e1.textContent = (dw >= 0 ? '+' : '') + dw.toFixed(2); e1.className = 'c-dw ' + (dw > 0 ? 'up' : (dw < 0 ? 'down' : ''));
+        const e2 = tr.querySelector('.c-ret'); e2.textContent = (ret >= 0 ? '+' : '') + ret.toFixed(2) + '%'; e2.className = 'c-ret ' + (ret > 0 ? 'up' : (ret < 0 ? 'down' : ''));
+        const e3 = tr.querySelector('.c-contrib'); e3.textContent = (ct >= 0 ? '+' : '') + ct.toFixed(2) + '%'; e3.className = 'c-contrib ' + (ct > 0 ? 'up' : (ct < 0 ? 'down' : ''));
+        tr.querySelector('.c-price').textContent = price.toFixed(2);
+        tr.querySelector('.c-lots').textContent = lots.toLocaleString();
+        tr.querySelector('.c-value').textContent = Math.round(value).toLocaleString();
+        tr.querySelector('.c-aw').textContent = aw.toFixed(2);
+      }}
+      const cash = CAPITAL - mv, pr = pnl / CAPITAL * 100;
+      document.getElementById('mv').textContent = Math.round(mv).toLocaleString();
+      document.getElementById('cash').textContent = Math.round(cash).toLocaleString();
+      const ep = document.getElementById('pnl'); ep.textContent = (pnl >= 0 ? '+' : '') + Math.round(pnl).toLocaleString(); ep.className = pnl >= 0 ? 'up' : 'down';
+      const er = document.getElementById('pret'); er.textContent = (pr >= 0 ? '+' : '') + pr.toFixed(2) + '%'; er.className = pr >= 0 ? 'up' : 'down';
+      document.getElementById('tcontrib').textContent = (pr >= 0 ? '+' : '') + pr.toFixed(2) + '%';
+      document.getElementById('tmv').textContent = Math.round(mv).toLocaleString();
+      document.getElementById('taw').textContent = (mv / CAPITAL * 100).toFixed(2);
+      document.getElementById('ddate').textContent = d;
+      document.getElementById('st').textContent = '已加载最新数据（数据日期 ' + d + '，检查时间 ' + new Date().toLocaleTimeString() + '）';
+    }})
+    .catch(() => {{ document.getElementById('st').textContent = '无法读取最新数据，显示页面生成时的结果'; }});
 }}
-
-function refresh() {{
-  const s = document.createElement('script');
-  s.charset = 'gbk';
-  s.src = 'https://qt.gtimg.cn/q=' + DATA.rows.map(r => SYM(r.code)).join(',') + '&_=' + Date.now();
-  s.onload = () => {{ try {{ apply(); }} catch (e) {{ console.log(e); }} s.remove(); }};
-  s.onerror = () => {{ document.getElementById('st').textContent = '实时报价不可用，显示最近一次计算结果'; s.remove(); }};
-  document.head.appendChild(s);
-}}
-refresh();
-setInterval(refresh, 60000);
-document.addEventListener('visibilitychange', () => {{ if (!document.hidden) refresh(); }});
+loadLatest();
+document.addEventListener('visibilitychange', () => {{ if (!document.hidden) loadLatest(); }});
 </script>
 </body></html>"""
 out = outdir("report") / "dashboard.html"
 out.write_text(html, encoding="utf-8")
 (outdir("report") / "index.html").write_text('<meta http-equiv="refresh" content="0; url=dashboard.html">', encoding="utf-8")
+T.to_csv(outdir("report") / "今日权重.csv", index=False, encoding="utf-8-sig")
 T.to_csv(outdir("stats") / "今日权重.csv", index=False, encoding="utf-8-sig")
 print("面板已生成:", out)
 print(T[["name", "now", "price", "lots", "actual_value", "actual_w"]].to_string(index=False))
