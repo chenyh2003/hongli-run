@@ -9,23 +9,97 @@ td,th{border:1px solid #ddd;padding:5px 9px;font-size:13px;text-align:right}
 th{background:#f2f2f2;text-align:center}
 td:nth-child(-n+3){text-align:left} .up{color:#c0392b} .down{color:#2c7fb8}
 tfoot td{background:#f7f7f7;font-weight:bold}
+#st{color:#777;font-size:12px;margin:6px 0}
 </style></head><body>
 <h1>策略1 BCD 今日持仓</h1>
 <div>数据日期：<b>2026-10-27</b> ｜ 目标权重基准日：2026-10-08 ｜ 初始资金：1,000,000 元 ｜ 仓位：100%</div>
+<div id="st">打开页面后自动刷新实时报价（60 秒一次）</div>
 <div class="cards">
-<div class="card"><span>持仓市值</span><b>991,618</b></div>
-<div class="card"><span>现金</span><b>8,382</b></div>
-<div class="card"><span>今日盈亏</span><b class="up">+251</b></div>
-<div class="card"><span>今日收益率</span><b class="up">+0.03%</b></div>
+<div class="card"><span>持仓市值</span><b id="mv">992,231</b></div>
+<div class="card"><span>现金</span><b id="cash">7,769</b></div>
+<div class="card"><span>今日盈亏</span><b id="pnl" class="up">+10,463</b></div>
+<div class="card"><span>今日收益率</span><b id="pret" class="up">+1.05%</b></div>
 <div class="card"><span>持仓只数</span><b>16</b></div>
 </div>
 <table>
 <thead><tr><th>名称</th><th>代码</th><th>行业</th><th>目标%</th><th>当前%</th><th>Δ昨日</th>
 <th>涨跌</th><th>贡献</th><th>价格</th><th>手数</th><th>市值(元)</th><th>实际%</th></tr></thead>
-<tbody><tr><td>沪农商行</td><td>601825</td><td>农商行Ⅲ</td><td class=''>20.83</td><td class=''>21.01</td><td class='up'>+0.28</td><td class='up'>+1.37%</td><td class='up'>+0.28%</td><td class=''>8.88</td><td class=''>236</td><td class=''>209,568</td><td class=''>20.96</td></tr><tr><td>中国石化</td><td>600028</td><td>炼油化工</td><td class=''>20.83</td><td class=''>20.72</td><td class='down'>-0.19</td><td class='down'>-0.90%</td><td class='down'>-0.19%</td><td class=''>5.51</td><td class=''>376</td><td class=''>207,176</td><td class=''>20.72</td></tr><tr><td>华夏银行</td><td>600015</td><td>股份制银行Ⅲ</td><td class=''>6.94</td><td class=''>6.87</td><td class='down'>-0.01</td><td class='down'>-0.16%</td><td class='down'>-0.01%</td><td class=''>6.32</td><td class=''>108</td><td class=''>68,256</td><td class=''>6.83</td></tr><tr><td>光大银行</td><td>601818</td><td>股份制银行Ⅲ</td><td class=''>6.94</td><td class=''>6.80</td><td class='up'>+0.04</td><td class='up'>+0.66%</td><td class='up'>+0.04%</td><td class=''>3.05</td><td class=''>223</td><td class=''>68,015</td><td class=''>6.80</td></tr><tr><td>中信银行</td><td>601998</td><td>股份制银行Ⅲ</td><td class=''>6.94</td><td class=''>6.81</td><td class='up'>+0.02</td><td class='up'>+0.33%</td><td class='up'>+0.02%</td><td class=''>9.00</td><td class=''>75</td><td class=''>67,500</td><td class=''>6.75</td></tr><tr><td>农业银行</td><td>601288</td><td>国有大型银行Ⅲ</td><td class=''>4.17</td><td class=''>4.35</td><td class='down'>-0.03</td><td class='down'>-0.68%</td><td class='down'>-0.03%</td><td class=''>7.29</td><td class=''>59</td><td class=''>43,011</td><td class=''>4.30</td></tr><tr><td>工商银行</td><td>601398</td><td>国有大型银行Ⅲ</td><td class=''>4.17</td><td class=''>4.29</td><td class='down'>-0.04</td><td class='down'>-0.93%</td><td class='down'>-0.04%</td><td class=''>8.51</td><td class=''>50</td><td class=''>42,550</td><td class=''>4.26</td></tr><tr><td>建设银行</td><td>601939</td><td>国有大型银行Ⅲ</td><td class=''>4.17</td><td class=''>4.32</td><td class='up'>+0.03</td><td class='up'>+0.69%</td><td class='up'>+0.03%</td><td class=''>11.70</td><td class=''>36</td><td class=''>42,120</td><td class=''>4.21</td></tr><tr><td>中国银行</td><td>601988</td><td>国有大型银行Ⅲ</td><td class=''>4.17</td><td class=''>4.22</td><td class='down'>-0.02</td><td class='down'>-0.43%</td><td class='down'>-0.02%</td><td class=''>6.97</td><td class=''>60</td><td class=''>41,820</td><td class=''>4.18</td></tr><tr><td>邮储银行</td><td>601658</td><td>国有大型银行Ⅲ</td><td class=''>4.17</td><td class=''>4.17</td><td class='down'>-0.02</td><td class='down'>-0.36%</td><td class='down'>-0.02%</td><td class=''>5.55</td><td class=''>75</td><td class=''>41,625</td><td class=''>4.16</td></tr><tr><td>中远海控</td><td>601919</td><td>航运</td><td class=''>4.17</td><td class=''>4.18</td><td class='up'>+0.01</td><td class='up'>+0.31%</td><td class='up'>+0.01%</td><td class=''>16.41</td><td class=''>25</td><td class=''>41,025</td><td class=''>4.10</td></tr><tr><td>冀中能源</td><td>000937</td><td>焦煤</td><td class=''>4.17</td><td class=''>3.92</td><td class='down'>-0.01</td><td class='down'>-0.24%</td><td class='down'>-0.01%</td><td class=''>4.23</td><td class=''>92</td><td class=''>38,916</td><td class=''>3.89</td></tr><tr><td>山东高速</td><td>600350</td><td>高速公路</td><td class=''>2.08</td><td class=''>2.17</td><td class='down'>-0.03</td><td class='down'>-1.46%</td><td class='down'>-0.03%</td><td class=''>10.78</td><td class=''>20</td><td class=''>21,560</td><td class=''>2.16</td></tr><tr><td>宁沪高速</td><td>600377</td><td>高速公路</td><td class=''>2.08</td><td class=''>2.12</td><td class='down'>-0.00</td><td class='down'>+0.00%</td><td class=''>+0.00%</td><td class=''>13.60</td><td class=''>15</td><td class=''>20,400</td><td class=''>2.04</td></tr><tr><td>中国神华</td><td>601088</td><td>动力煤</td><td class=''>2.08</td><td class=''>2.18</td><td class='down'>-0.04</td><td class='down'>-1.83%</td><td class='down'>-0.04%</td><td class=''>49.23</td><td class=''>4</td><td class=''>19,692</td><td class=''>1.97</td></tr><tr><td>恒源煤电</td><td>600971</td><td>动力煤</td><td class=''>2.08</td><td class=''>1.87</td><td class='up'>+0.00</td><td class='up'>+0.26%</td><td class='up'>+0.00%</td><td class=''>7.66</td><td class=''>24</td><td class=''>18,384</td><td class=''>1.84</td></tr></tbody>
+<tbody id="tb"><tr data-code='601825'><td>沪农商行</td><td>601825</td><td>农商行Ⅲ</td><td class='c-target'>20.83</td><td class='c-now'><b>21.19</b></td><td class='c-dw up'>+0.47</td><td class='c-ret up'>+3.31%</td><td class='c-contrib up'>+0.69%</td><td class='c-price'>9.05</td><td class='c-lots'>234</td><td class='c-value'>211,770</td><td class='c-aw'>21.18</td></tr><tr data-code='600028'><td>中国石化</td><td>600028</td><td>炼油化工</td><td class='c-target'>20.83</td><td class='c-now'><b>20.58</b></td><td class='c-dw down'>-0.32</td><td class='c-ret down'>-0.54%</td><td class='c-contrib down'>-0.11%</td><td class='c-price'>5.53</td><td class='c-lots'>372</td><td class='c-value'>205,716</td><td class='c-aw'>20.57</td></tr><tr data-code='600015'><td>华夏银行</td><td>600015</td><td>股份制银行Ⅲ</td><td class='c-target'>6.94</td><td class='c-now'><b>6.86</b></td><td class='c-dw down'>-0.02</td><td class='c-ret down'>+0.79%</td><td class='c-contrib up'>+0.05%</td><td class='c-price'>6.37</td><td class='c-lots'>107</td><td class='c-value'>68,159</td><td class='c-aw'>6.82</td></tr><tr data-code='601818'><td>光大银行</td><td>601818</td><td>股份制银行Ⅲ</td><td class='c-target'>6.94</td><td class='c-now'><b>6.82</b></td><td class='c-dw up'>+0.06</td><td class='c-ret up'>+1.98%</td><td class='c-contrib up'>+0.13%</td><td class='c-price'>3.08</td><td class='c-lots'>221</td><td class='c-value'>68,068</td><td class='c-aw'>6.81</td></tr><tr data-code='601998'><td>中信银行</td><td>601998</td><td>股份制银行Ⅲ</td><td class='c-target'>6.94</td><td class='c-now'><b>6.80</b></td><td class='c-dw up'>+0.01</td><td class='c-ret up'>+1.23%</td><td class='c-contrib up'>+0.08%</td><td class='c-price'>9.08</td><td class='c-lots'>74</td><td class='c-value'>67,192</td><td class='c-aw'>6.72</td></tr><tr data-code='601288'><td>农业银行</td><td>601288</td><td>国有大型银行Ⅲ</td><td class='c-target'>4.17</td><td class='c-now'><b>4.32</b></td><td class='c-dw down'>-0.07</td><td class='c-ret down'>-0.55%</td><td class='c-contrib down'>-0.02%</td><td class='c-price'>7.29</td><td class='c-lots'>59</td><td class='c-value'>43,011</td><td class='c-aw'>4.30</td></tr><tr data-code='601398'><td>工商银行</td><td>601398</td><td>国有大型银行Ⅲ</td><td class='c-target'>4.17</td><td class='c-now'><b>4.29</b></td><td class='c-dw down'>-0.04</td><td class='c-ret down'>+0.00%</td><td class='c-contrib '>+0.00%</td><td class='c-price'>8.58</td><td class='c-lots'>50</td><td class='c-value'>42,900</td><td class='c-aw'>4.29</td></tr><tr data-code='601939'><td>建设银行</td><td>601939</td><td>国有大型银行Ⅲ</td><td class='c-target'>4.17</td><td class='c-now'><b>4.30</b></td><td class='c-dw up'>+0.00</td><td class='c-ret up'>+1.12%</td><td class='c-contrib up'>+0.05%</td><td class='c-price'>11.74</td><td class='c-lots'>36</td><td class='c-value'>42,264</td><td class='c-aw'>4.23</td></tr><tr data-code='601919'><td>中远海控</td><td>601919</td><td>航运</td><td class='c-target'>4.17</td><td class='c-now'><b>4.18</b></td><td class='c-dw up'>+0.01</td><td class='c-ret up'>+1.34%</td><td class='c-contrib up'>+0.06%</td><td class='c-price'>16.58</td><td class='c-lots'>25</td><td class='c-value'>41,450</td><td class='c-aw'>4.14</td></tr><tr data-code='601988'><td>中国银行</td><td>601988</td><td>国有大型银行Ⅲ</td><td class='c-target'>4.17</td><td class='c-now'><b>4.19</b></td><td class='c-dw down'>-0.05</td><td class='c-ret down'>-0.14%</td><td class='c-contrib down'>-0.01%</td><td class='c-price'>6.99</td><td class='c-lots'>59</td><td class='c-value'>41,241</td><td class='c-aw'>4.12</td></tr><tr data-code='601658'><td>邮储银行</td><td>601658</td><td>国有大型银行Ⅲ</td><td class='c-target'>4.17</td><td class='c-now'><b>4.14</b></td><td class='c-dw down'>-0.04</td><td class='c-ret down'>+0.00%</td><td class='c-contrib '>+0.00%</td><td class='c-price'>5.57</td><td class='c-lots'>74</td><td class='c-value'>41,218</td><td class='c-aw'>4.12</td></tr><tr data-code='000937'><td>冀中能源</td><td>000937</td><td>焦煤</td><td class='c-target'>4.17</td><td class='c-now'><b>3.93</b></td><td class='c-dw up'>+0.01</td><td class='c-ret up'>+1.18%</td><td class='c-contrib up'>+0.05%</td><td class='c-price'>4.29</td><td class='c-lots'>91</td><td class='c-value'>39,039</td><td class='c-aw'>3.90</td></tr><tr data-code='600350'><td>山东高速</td><td>600350</td><td>高速公路</td><td class='c-target'>2.08</td><td class='c-now'><b>2.18</b></td><td class='c-dw down'>-0.02</td><td class='c-ret down'>+0.27%</td><td class='c-contrib up'>+0.01%</td><td class='c-price'>10.96</td><td class='c-lots'>19</td><td class='c-value'>20,824</td><td class='c-aw'>2.08</td></tr><tr data-code='600377'><td>宁沪高速</td><td>600377</td><td>高速公路</td><td class='c-target'>2.08</td><td class='c-now'><b>2.12</b></td><td class='c-dw down'>-0.00</td><td class='c-ret down'>+0.96%</td><td class='c-contrib up'>+0.02%</td><td class='c-price'>13.73</td><td class='c-lots'>15</td><td class='c-value'>20,595</td><td class='c-aw'>2.06</td></tr><tr data-code='601088'><td>中国神华</td><td>601088</td><td>动力煤</td><td class='c-target'>2.08</td><td class='c-now'><b>2.19</b></td><td class='c-dw down'>-0.03</td><td class='c-ret down'>-0.34%</td><td class='c-contrib down'>-0.01%</td><td class='c-price'>49.98</td><td class='c-lots'>4</td><td class='c-value'>19,992</td><td class='c-aw'>2.00</td></tr><tr data-code='600971'><td>恒源煤电</td><td>600971</td><td>动力煤</td><td class='c-target'>2.08</td><td class='c-now'><b>1.89</b></td><td class='c-dw up'>+0.03</td><td class='c-ret up'>+2.49%</td><td class='c-contrib up'>+0.05%</td><td class='c-price'>7.83</td><td class='c-lots'>24</td><td class='c-value'>18,792</td><td class='c-aw'>1.88</td></tr></tbody>
 <tfoot><tr><td colspan="3">合计（含现金）</td><td></td><td></td><td></td><td></td>
-<td>+0.03%</td><td></td><td></td><td>991,618</td><td>99.16</td></tr></tfoot>
+<td id="tcontrib">+1.05%</td><td></td><td></td><td id="tmv">992,231</td><td id="taw">99.22</td></tr></tfoot>
 </table>
 <p style="color:#777">手数 = 向下取整（当前权重 × 初始资金 × 仓位 ÷ (价格 × 100)）；现金 = 初始资金 − 持仓市值。</p>
-<p style="color:#777">自动生成：红利运行 / code/dashboard.py</p>
+<p style="color:#777">行情：腾讯实时报价；页面打开时刷新，之后每 60 秒刷新；失败时显示最近一次计算结果。</p>
+<script>
+const DATA = {"capital": 1000000, "exposure": 1.0, "mwd": "2026-10-08", "rows": [{"code": "601825", "base_w": 0.20833333333333334, "base_px": 8.710000038146973}, {"code": "600028", "base_w": 0.20833333333333334, "base_px": 5.480000019073486}, {"code": "600015", "base_w": 0.06944444444444445, "base_px": 6.309999942779541}, {"code": "601818", "base_w": 0.06944444444444445, "base_px": 3.0799999237060547}, {"code": "601998", "base_w": 0.06944444444444445, "base_px": 9.079999923706055}, {"code": "601288", "base_w": 0.04166666666666667, "base_px": 7.019999980926514}, {"code": "601398", "base_w": 0.04166666666666667, "base_px": 8.3100004196167}, {"code": "601939", "base_w": 0.04166666666666667, "base_px": 11.149999618530273}, {"code": "601919", "base_w": 0.04166666666666667, "base_px": 16.600000381469727}, {"code": "601988", "base_w": 0.04166666666666667, "base_px": 6.809999942779541}, {"code": "601658", "base_w": 0.04166666666666667, "base_px": 5.489999771118164}, {"code": "000937", "base_w": 0.04166666666666667, "base_px": 4.449999809265137}, {"code": "600350", "base_w": 0.020833333333333336, "base_px": 10.260000228881836}, {"code": "600377", "base_w": 0.020833333333333336, "base_px": 13.1899995803833}, {"code": "601088", "base_w": 0.020833333333333336, "base_px": 47.4900016784668}, {"code": "600971", "base_w": 0.020833333333333336, "base_px": 8.430000305175781}]};
+const SYM = c => (c[0] === '6' ? 'sh' : 'sz') + c;
+
+function fmt(n, d=2) { return Number(n).toLocaleString('zh-CN', {minimumFractionDigits:d, maximumFractionDigits:d}); }
+
+function apply() {
+  const px = {}, pv = {}, tm = {};
+  let tstr = '';
+  for (const r of DATA.rows) {
+    const v = window['v_' + SYM(r.code)];
+    if (!v) continue;
+    const f = v.split('~');
+    const p = parseFloat(f[3]), q = parseFloat(f[4]);
+    if (!isFinite(p)) continue;
+    px[r.code] = p; pv[r.code] = q; tm[r.code] = f[30] || '';
+    tstr = tm[r.code];
+  }
+  let sumNow = 0, sumPrev = 0;
+  for (const r of DATA.rows) {
+    const p = px[r.code] || r.base_px, q = pv[r.code] || r.base_px;
+    r._now = r.base_w * (p / r.base_px);
+    r._prev = r.base_w * (q / r.base_px);
+    r._p = p; r._ret = (q > 0 ? p / q - 1 : 0);
+    sumNow += r._now; sumPrev += r._prev;
+  }
+  if (!sumNow) return;
+  let mv = 0, pnl = 0;
+  const tb = document.getElementById('tb');
+  for (const r of DATA.rows) {
+    const nowW = r._now / sumNow, prevW = r._prev / sumPrev;
+    const val = nowW * DATA.exposure * DATA.capital;
+    const lots = Math.floor(val / (r._p * 100));
+    const av = lots * 100 * r._p;
+    mv += av; pnl += prevW * DATA.exposure * DATA.capital * r._ret;
+    const tr = tb.querySelector("tr[data-code='" + r.code + "']");
+    if (!tr) continue;
+    tr.querySelector('.c-now').innerHTML = '<b>' + (nowW * 100).toFixed(2) + '</b>';
+    const dw = (nowW - prevW) * 100;
+    const e1 = tr.querySelector('.c-dw'); e1.textContent = (dw >= 0 ? '+' : '') + dw.toFixed(2); e1.className = 'c-dw ' + (dw > 0 ? 'up' : (dw < 0 ? 'down' : ''));
+    const e2 = tr.querySelector('.c-ret'); e2.textContent = (r._ret >= 0 ? '+' : '') + (r._ret * 100).toFixed(2) + '%'; e2.className = 'c-ret ' + (r._ret > 0 ? 'up' : (r._ret < 0 ? 'down' : ''));
+    const ct = prevW * r._ret * 100;
+    const e3 = tr.querySelector('.c-contrib'); e3.textContent = (ct >= 0 ? '+' : '') + ct.toFixed(2) + '%'; e3.className = 'c-contrib ' + (ct > 0 ? 'up' : (ct < 0 ? 'down' : ''));
+    tr.querySelector('.c-price').textContent = r._p.toFixed(2);
+    tr.querySelector('.c-lots').textContent = lots.toLocaleString();
+    tr.querySelector('.c-value').textContent = Math.round(av).toLocaleString();
+    tr.querySelector('.c-aw').textContent = (av / DATA.capital * 100).toFixed(2);
+  }
+  const cash = DATA.capital - mv, pr = pnl / DATA.capital * 100;
+  document.getElementById('mv').textContent = Math.round(mv).toLocaleString();
+  document.getElementById('cash').textContent = Math.round(cash).toLocaleString();
+  const ep = document.getElementById('pnl'); ep.textContent = (pnl >= 0 ? '+' : '') + Math.round(pnl).toLocaleString(); ep.className = pnl >= 0 ? 'up' : 'down';
+  const er = document.getElementById('pret'); er.textContent = (pr >= 0 ? '+' : '') + pr.toFixed(2) + '%'; er.className = pr >= 0 ? 'up' : 'down';
+  document.getElementById('tcontrib').textContent = (pr >= 0 ? '+' : '') + pr.toFixed(2) + '%';
+  document.getElementById('tmv').textContent = Math.round(mv).toLocaleString();
+  document.getElementById('taw').textContent = (mv / DATA.capital * 100).toFixed(2);
+  const t = tstr ? tstr.slice(0, 4) + '-' + tstr.slice(4, 6) + '-' + tstr.slice(6, 8) + ' ' + tstr.slice(8, 10) + ':' + tstr.slice(10, 12) + ':' + tstr.slice(12, 14) : '';
+  document.getElementById('st').textContent = '实时报价已更新 ' + new Date().toLocaleTimeString() + (t ? '（行情时间 ' + t + '）' : '') + '，60 秒自动刷新';
+}
+
+function refresh() {
+  const s = document.createElement('script');
+  s.charset = 'gbk';
+  s.src = 'https://qt.gtimg.cn/q=' + DATA.rows.map(r => SYM(r.code)).join(',') + '&_=' + Date.now();
+  s.onload = () => { try { apply(); } catch (e) { console.log(e); } s.remove(); };
+  s.onerror = () => { document.getElementById('st').textContent = '实时报价不可用，显示最近一次计算结果'; s.remove(); };
+  document.head.appendChild(s);
+}
+refresh();
+setInterval(refresh, 60000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+</script>
 </body></html>
