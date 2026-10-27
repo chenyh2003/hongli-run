@@ -35,6 +35,16 @@ STK = pd.DataFrame(z["streak"], index=old_dates, columns=codes)
 _t = np.load(RET, allow_pickle=True)
 TR = pd.DataFrame(_t["ret"], index=pd.to_datetime(_t["dates"]), columns=_t["codes"])
 
+_bj = pd.Timestamp.utcnow() + pd.Timedelta(hours=8)
+_trimmed = False
+if _bj.hour < 15 or (_bj.hour == 15 and _bj.minute < 5):
+    _m = old_dates < pd.Timestamp(_bj.date())
+    _trimmed = bool((~_m).any())
+    QF, RW, SH = QF[_m], RW[_m], SH[_m]
+    DPS, STK = DPS[_m], STK[_m]
+    TR = TR[TR.index < pd.Timestamp(_bj.date())]
+    old_dates = old_dates[_m]
+
 last = old_dates.max()
 start = (last + pd.Timedelta(days=1)).strftime("%Y%m%d")
 end = pd.Timestamp.today().strftime("%Y%m%d")
@@ -106,8 +116,27 @@ for i, c in enumerate(codes):
 QN = pd.DataFrame(new_q).sort_index().dropna(how="all")
 RN = pd.DataFrame(new_r).sort_index().dropna(how="all")
 DN = pd.DataFrame(new_d).reindex(columns=codes).fillna(0.0) if new_d else pd.DataFrame(index=[], columns=codes)
+
+bj = pd.Timestamp.utcnow() + pd.Timedelta(hours=8)
+if bj.hour < 15 or (bj.hour == 15 and bj.minute < 5):
+    today_str = bj.strftime("%Y-%m-%d")
+    if len(QN):
+        QN = QN[QN.index.strftime("%Y-%m-%d") < today_str]
+    if len(RN):
+        RN = RN[RN.index.strftime("%Y-%m-%d") < today_str]
+    if len(DN):
+        DN = DN[DN.index.strftime("%Y-%m-%d") < today_str]
+
 if QN.empty and RN.empty:
     print("没有新数据")
+    if _trimmed:
+        np.savez_compressed(SLIM, qfq=QF.values.astype(np.float32), raw=RW.values.astype(np.float32),
+                            sh=SH.values.astype(np.float32), dps=DPS.values.astype(np.float32),
+                            streak=STK.values.astype(np.float32), dates=QF.index.values,
+                            codes=np.array(codes))
+        np.savez_compressed(RET, ret=TR.values.astype(np.float32), dates=TR.index.values,
+                            codes=np.array(codes))
+        print("已清理盘中数据，最新交易日:", old_dates.max().date())
     sys.exit(0)
 
 idx_new = QN.index.union(RN.index)
