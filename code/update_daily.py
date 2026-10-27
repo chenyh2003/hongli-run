@@ -78,10 +78,10 @@ for i, c in enumerate(codes):
     if (i + 1) % 10 == 0:
         time.sleep(0.3)
 
-QN = pd.DataFrame(new_q).sort_index()
-RN = pd.DataFrame(new_r).sort_index()
+QN = pd.DataFrame(new_q).sort_index().dropna(how="all")
+RN = pd.DataFrame(new_r).sort_index().dropna(how="all")
 DN = pd.DataFrame(new_d).reindex(columns=codes).fillna(0.0) if new_d else pd.DataFrame(index=[], columns=codes)
-if QN.empty:
+if QN.empty and RN.empty:
     print("没有新数据")
     sys.exit(0)
 
@@ -91,13 +91,14 @@ QF2 = QF2[~QF2.index.duplicated(keep="last")]
 RW2 = pd.concat([RW.astype("float64"), RN.reindex(idx_new).astype("float64")]).sort_index()
 RW2 = RW2[~RW2.index.duplicated(keep="last")]
 SH2 = SH.reindex(QF2.index).ffill()
-DPS2 = pd.concat([DPS, DN.reindex(idx_new)]).sort_index()
+DPS2 = pd.concat([DPS.astype("float64"), DN.reindex(idx_new).astype("float64")]).sort_index()
 DPS2 = DPS2[~DPS2.index.duplicated(keep="last")].fillna(0.0)
-TR2 = TR.astype("float64").reindex(QF2.index).copy()
 prev_close = RW2.shift(1)
-mask = QF2.index > last
-TR2.loc[mask] = (RW2.loc[mask] + DPS2.loc[mask]) / prev_close.loc[mask] - 1
-TR2 = TR2.replace([np.inf, -np.inf], np.nan)
+new_ret = (RW2 + DPS2) / prev_close - 1
+new_ret = new_ret.replace([np.inf, -np.inf], np.nan)
+old_tr = TR.astype("float64")
+TR2 = pd.concat([old_tr.loc[old_tr.index <= last], new_ret.loc[new_ret.index > last]]).sort_index()
+TR2 = TR2[TR2.index.isin(QF2.index)]
 ST2 = pd.DataFrame(np.zeros_like(QF2.values), index=QF2.index, columns=codes)
 
 np.savez_compressed(SLIM, qfq=QF2.values.astype(np.float32), raw=RW2.values.astype(np.float32),
