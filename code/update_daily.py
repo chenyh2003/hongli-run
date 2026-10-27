@@ -40,12 +40,37 @@ start = (last + pd.Timedelta(days=1)).strftime("%Y%m%d")
 end = pd.Timestamp.today().strftime("%Y%m%d")
 
 def fetch_hist(code, adjust):
-    d = ak.stock_zh_a_hist(symbol=code, period="daily", start_date=start, end_date=end, adjust=adjust)
-    if d is None or len(d) == 0:
+    try:
+        d = ak.stock_zh_a_hist(symbol=code, period="daily", start_date=start, end_date=end, adjust=adjust)
+        if d is not None and len(d):
+            d = d.rename(columns={"日期": "date", "收盘": "close"})
+            d["date"] = pd.to_datetime(d["date"])
+            return d.set_index("date")["close"].astype(float)
+    except Exception:
+        pass
+    return fetch_tencent(code, adjust)
+
+def fetch_tencent(code, adjust):
+    try:
+        import requests
+    except Exception:
         return pd.Series(dtype=float)
-    d = d.rename(columns={"日期": "date", "收盘": "close"})
-    d["date"] = pd.to_datetime(d["date"])
-    return d.set_index("date")["close"].astype(float)
+    sym = ("sh" if code.startswith("6") else "sz") + code
+    fq = "qfq" if adjust else ""
+    s = pd.Timestamp(start).strftime("%Y-%m-%d")
+    e = pd.Timestamp(end).strftime("%Y-%m-%d")
+    url = f"https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={sym},day,{s},{e},640,{fq}"
+    try:
+        j = requests.get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0"}).json()
+        data = j["data"][sym]
+        rows = data.get("qfqday") or data.get("day") or []
+        if not rows:
+            return pd.Series(dtype=float)
+        d = pd.DataFrame([(r[0], r[2]) for r in rows], columns=["date", "close"])
+        d["date"] = pd.to_datetime(d["date"])
+        return d.set_index("date")["close"].astype(float)
+    except Exception:
+        return pd.Series(dtype=float)
 
 def fetch_div(code):
     try:
@@ -107,7 +132,8 @@ np.savez_compressed(SLIM, qfq=QF2.values.astype(np.float32), raw=RW2.values.asty
                     codes=np.array(codes))
 np.savez_compressed(RET, ret=TR2.values.astype(np.float32), dates=QF2.index.values,
                     codes=np.array(codes))
-print("行情更新完成:", last.date(), "->", QF2.index[-1].date(), "新增", int(mask.sum()), "天")
+new_dates = QF2.index > last
+print("行情更新完成:", last.date(), "->", QF2.index[-1].date(), "新增", int(new_dates.sum()), "天")
 
 # 利率（尽力更新；失败则冻结）
 RT = ROOT / "data" / "rates"
