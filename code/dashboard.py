@@ -14,6 +14,8 @@ dates = pd.to_datetime(z["dates"])
 codes = z["codes"]
 qfq = pd.DataFrame(z["qfq"], index=dates, columns=codes)
 raw = pd.DataFrame(z["raw"], index=dates, columns=codes)
+qfqf = qfq.ffill()
+rawf = raw.ffill()
 
 H = pd.read_csv(outdir("holdings") / "BCD_monthly_weights.csv", parse_dates=["date"], dtype={"code": str})
 H["code"] = H["code"].str.zfill(6)
@@ -30,16 +32,16 @@ base = H[H["date"] == mwd].set_index("code")["weight"]
 expo = float(ST.asof(today)) if pd.notna(ST.asof(today)) else 1.0
 
 def drift(day):
-    px0 = qfq.loc[mwd, base.index]
-    pxt = qfq.loc[day, base.index]
+    px0 = qfqf.loc[mwd, base.index]
+    pxt = qfqf.loc[day, base.index]
     val = base * (pxt / px0)
     return val / val.sum()
 
 w_t = drift(today)
 w_p = drift(prev)
-ret_t = qfq.loc[today, w_t.index] / qfq.loc[prev, w_t.index] - 1
+ret_t = qfqf.loc[today, w_t.index] / qfqf.loc[prev, w_t.index] - 1
 contrib = w_p * ret_t
-price = raw.loc[today, w_t.index]
+price = rawf.loc[today, w_t.index]
 
 T = pd.DataFrame({"code": w_t.index,
                   "name": [META.get(c, {}).get("name", "") for c in w_t.index],
@@ -52,9 +54,12 @@ T = pd.DataFrame({"code": w_t.index,
                   "price": price.reindex(w_t.index).values})
 T["dw"] = T["now"] - T["prev"]
 T["value"] = T["now"] * CAPITAL * expo
-T["lots"] = np.floor(T["value"] / (T["price"] * 100)).astype(int)
+px = T["price"].ffill().fillna(0)
+T["price"] = px
+T["lots"] = np.floor(T["value"] / (px * 100)).fillna(0).astype(int)
 T["shares"] = T["lots"] * 100
-T["actual_value"] = T["shares"] * T["price"]
+T["actual_value"] = T["shares"] * px
+T["ret"] = T["ret"].fillna(0)
 T["actual_w"] = T["actual_value"] / CAPITAL
 T["pnl"] = T["actual_value"] * T["ret"]
 T = T.sort_values("actual_value", ascending=False).reset_index(drop=True)
