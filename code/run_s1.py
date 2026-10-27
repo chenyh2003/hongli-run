@@ -104,7 +104,7 @@ def weights_at(d, y):
     for (l1, l3), cs in g3.items():
         base = coef(l1, bd)
         sib = sorted(set(k for (ll, k) in g3 if ll == l1))
-        s = pd.Series({k: LEAD.get((l1, k), pd.Series()).shift(1).get(d, np.nan) for k in sib}).dropna()
+        s = pd.Series({k: LEAD.get((l1, k), pd.Series(dtype=float)).shift(1).asof(d) for k in sib}).dropna()
         if len(s) > 1:
             rq = s.rank(pct=True) - 0.5
             base *= max(1.0 + 2.0 * rq.get(l3, 0.0), 0.05)
